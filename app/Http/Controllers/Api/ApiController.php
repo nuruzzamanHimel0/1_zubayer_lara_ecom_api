@@ -70,10 +70,11 @@ class ApiController extends Controller
                     ],
                 ]);
                 return response()->json([
-                    'data' => json_decode((string) $response->getBody(), true),
-                    'user' => $user
+                    'status' => 'success',
+                    'data' => json_decode((string) $response->getBody(), true)
                 ]);
                 // return json_decode((string) $response->getBody(), true);
+              
             }
             else{
                 return response()->json([
@@ -91,4 +92,25 @@ class ApiController extends Controller
             'data' => $user
         ]);
     }
+
+    public function authuser(Request $request){
+        $http = new Client;
+
+        $response = $http->request('GET', url("/api/user"), [
+            'headers' => [
+                'Accept' => 'application/json',
+                'Authorization' => 'Bearer '.$request->accessToken,
+            ],
+        ]);
+
+         return response()->json([
+            'status' => 'success',
+                'data' => json_decode((string) $response->getBody(), true)
+            ]);
+    }
+
+
+   
+
+
 }
