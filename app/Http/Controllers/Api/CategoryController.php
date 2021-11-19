@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Category;
 
 class CategoryController extends Controller
 {
@@ -25,11 +26,31 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+          $this->validate($request, [
+            'category_name' => 'required|unique:categories',
+            'category_description' => 'required',
+             'publication_status' => 'required',
+        ]);
 
-       return response()->json([
-        'status' => 'success',
-        'data' => $request->all()
-       ]);
+        // $category =  Category::create([
+        //     'category_name' => $request->category_name,
+        //       'category_description' => $request->category_description,
+        //         'publication_status' => $request->publication_status,
+        // ]);
+
+           $category = new Category;
+           $category->fill($request->all());
+
+
+        if($category->save()){
+             return response()->json([
+            'status' => 'success',
+            'data' => $request->all()
+           ]);
+        }
+
+         
+      
     }
 
     /**
