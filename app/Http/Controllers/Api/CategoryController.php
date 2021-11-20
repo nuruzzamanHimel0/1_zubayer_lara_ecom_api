@@ -67,7 +67,15 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        //
+        $categories = Category::where('id',$id)->first();
+
+        if(!is_null($categories)){
+            return response()->json([
+                'status' => 'success',
+                'data' => $categories
+            ]);
+        }
+    
     }
 
     /**
@@ -79,7 +87,14 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+         $categories = Category::where('id',$id)->update($request->all());
+
+        if(!is_null($categories)){
+            return response()->json([
+                'status' => 'success',
+               
+            ]);
+        }
     }
 
     /**
