@@ -15,7 +15,13 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-         dd($request->all());
+        $categories = Category::orderBy('id','desc')->get();
+        if(!is_null($categories)){
+            return response()->json([
+                'status' => 'success',
+                'data' => $categories
+            ]);
+        }
     }
 
     /**
