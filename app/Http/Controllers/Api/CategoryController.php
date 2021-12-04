@@ -105,6 +105,17 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        //
+         $category_dlt = Category::where('id',$id)->delete();
+
+        if(!is_null($category_dlt)){
+            return response()->json([
+                'status' => 'success',
+               
+            ]);
+        }
+         // return response()->json([
+         //        'status' => $id
+               
+         //    ]);
     }
 }
