@@ -25,3 +25,5 @@ Route::post('/auth-user','Api\ApiController@authuser');
 
 
 Route::apiResource('/category','Api\CategoryController');
+
+Route::apiResource('/product','Api\ProductController');
