@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Product;
 use Image;
 use Carbon\Carbon;
+use File;
 
 class ProductController extends Controller
 {
@@ -98,7 +99,13 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        //
+        $product = Product::with(['category'])->where("id",$id)->first();
+        if(isset($product)){
+            return response()->json([
+                'status' => 'success',
+                'data' => $product
+            ]);
+        }
     }
 
     /**
@@ -110,7 +117,80 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        // return response()->json($request->all(), $id);
+
+         $this->validate($request, [
+            'product_name' => 'required',
+            'category_id' => 'required',
+            'product_short_description' => 'required',
+            'product_long_description' => 'required',
+           'product_price'=>'required|integer',
+            'publication_status' => 'required',
+            'product_image' => 'required',
+
+        ]);
+
+          $product = Product::with(['category'])->where("id",$id)->first();
+
+          if($product->product_image == $request->product_image){
+
+                $update_product =  Product::where('id',$request->id)->update([
+                   'product_name'=>$request->product_name,
+                   'category_id'=>$request->category_id,
+                   'product_short_description'=>$request->product_short_description,
+                   'product_long_description'=>$request->product_long_description,
+                   'product_price'=>$request->product_price,
+                   'publication_status'=>$request->publication_status,
+                   'created_at'=>Carbon::now(),
+                ]);
+
+                  return response()->json([
+                    'status' => 'success',
+                    
+                   ]);
+          }else{
+                $file_url = public_path('images/products/'.$product->product_image);
+
+                if(file_exists($file_url)){
+                      File::delete($file_url);
+                }
+                $strpos = strpos($request->product_image, ';');
+                 $string = substr($request->product_image, 0,$strpos);
+
+                 $extention = substr(strrchr($string, '/'), 1);
+
+                $image_name = rand().".".$extention;
+                $image_save = public_path('images/products/'.$image_name);
+
+                // open an image file
+                $img = Image::make($request->product_image);
+                // now you are able to resize the instance
+                $img->resize(320, 240);
+                // finally we save the image as a new file
+                $img->save($image_save);
+
+
+                $insert_product =  Product::where('id',$request->id)->update([
+                   'product_name'=>$request->product_name,
+                   'category_id'=>$request->category_id,
+                   'product_short_description'=>$request->product_short_description,
+                   'product_long_description'=>$request->product_long_description,
+                   'product_price'=>$request->product_price,
+                   'publication_status'=>$request->publication_status,
+                   "product_image" => $image_name,
+                   'created_at'=>Carbon::now(),
+                ]);
+
+                  return response()->json([
+                    'status' => 'success',
+                    
+                   ]);
+          }
+
+         // data:image/jpeg;base64,/9j/4SUqRXhpZgAASUkqAA
+         // "data:image/jpeg"
+
+         
     }
 
     /**
@@ -121,6 +201,22 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $product = Product::find($id);
+
+        $file_url = public_path('images/products/'.$product->product_image);
+
+        if(file_exists($file_url)){
+              File::delete($file_url);
+        }
+
+        if($product->delete()){
+            return response()->json([
+                'status' => 'success'
+            ]);
+        }
+        
+
+        // return response()->json($file_url);
+        // dd($id);
     }
 }
