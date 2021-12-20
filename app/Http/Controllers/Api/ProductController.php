@@ -19,7 +19,26 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with(['category'])->latest()->get();
+
         if(isset($products)){
+            return response()->json([
+                'status' => 'success',
+                'data' => $products
+            ]);
+        }
+        // dd($products);
+    }
+    public function product_paginate(Request $request)
+    {
+
+    
+        $products = Product::with(['category'])->latest()->paginate(8);
+       //  return response()->json([
+       // $products
+    // ]);
+         
+        if(isset($products)){
+
             return response()->json([
                 'status' => 'success',
                 'data' => $products
@@ -100,6 +119,7 @@ class ProductController extends Controller
     public function show($id)
     {
         $product = Product::with(['category'])->where("id",$id)->get();
+            // $product = Product::with(['category'])->where("id",$id)->paginate(5);
         if(isset($product)){
             return response()->json([
                 'status' => 'success',
